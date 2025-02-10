@@ -30,17 +30,16 @@ public class Inicio extends JFrame {
         menuAbrir.addActionListener(e -> abrirArchivo());
         menuGuardar.addActionListener(e -> guardarArchivo());
 
-        // Agregar los elementos al menú
         menuArchivo.add(menuNuevo);
         menuArchivo.add(menuAbrir);
         menuArchivo.add(menuGuardar);
         menuBar.add(menuArchivo);
 
-        // Configurar área de código
+        // area para escribir el código
         codigo = new JTextArea(20, 30);
         JScrollPane scrollCodigo = new JScrollPane(codigo);
 
-        // Configurar tabla de tokens
+        // tabla de tokens y tipos
         String[] columnas = { "Token", "Tipo" };
         tableModel = new DefaultTableModel(columnas, 0);
         tokensResultado = new JTable(tableModel);
