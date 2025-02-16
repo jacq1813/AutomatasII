@@ -12,7 +12,7 @@ public class Escaner {
     private String tipo;
 
     public Escaner(String codigo) {
-        this.tokens = codigo.split("\\s+"); // Divide por espacios en blanco
+        this.tokens = codigo.split("\\s+");
         this.i = 0;
     }
 
@@ -66,7 +66,7 @@ public class Escaner {
 
     private boolean esNumero(String token) {
         if (token.matches("\\d+(\\.\\d+)?")) {
-            this.tipo = "Número";
+            this.tipo = "Numero";
             return true;
         }
         return false;
@@ -80,6 +80,11 @@ public class Escaner {
         }
         return false;
     }
+
+    // vericifar si es una cadena con la regla de la gramatica, si el token es un "
+    // sigue leyendo hasta encontrar otro " y guarda todo lo que esta dentro de las
+    // comillas en un solo token
+    // AGREGAR LO ANTERIOR
 
     public String getToken(boolean sigue) {
         if (i >= tokens.length) {

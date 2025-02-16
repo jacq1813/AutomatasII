@@ -1,5 +1,5 @@
 P ->	D S 
-D ->	( int | string | float )  ID ; D
+D ->	( int | string | float ) ID ; D
 D ->	ε
 S ->	in > ID ;
 S ->	out < E ;
@@ -10,8 +10,11 @@ E ->	ID | num | E + E | E - E | E * E | E / E
 C ->	E IN E
 IN ->	== | != | < | <= | > | >= 
 ID ->	letra (letra | digito)*
+cadena -> " (letra | digito | espacio)* "    
 num ->	digitos frac
 frac -> 		. digitos | ε
 digitos -> 	digito digito*
 digito -> 	0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 letra -> 	[A-Z] | [a-z]
+
+

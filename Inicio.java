@@ -40,7 +40,7 @@ public class Inicio extends JFrame {
         JScrollPane scrollCodigo = new JScrollPane(codigo);
 
         // tabla de tokens y tipos
-        String[] columnas = { "Token", "Tipo" };
+        String[] columnas = { "Token", "Tipo", "Error" };
         tableModel = new DefaultTableModel(columnas, 0);
         tokensResultado = new JTable(tableModel);
         JScrollPane scrollTabla = new JScrollPane(tokensResultado);
@@ -96,10 +96,29 @@ public class Inicio extends JFrame {
 
     private void analizarCodigo() {
         tableModel.setRowCount(0);
-        Escaner escaner = new Escaner(codigo.getText());
-        String token;
-        while (!(token = escaner.getToken(true)).equals("EOF")) {
-            tableModel.addRow(new Object[] { token, escaner.getTipo() });
+        String codigoFuente = codigo.getText();
+        Parser parser = new Parser(codigoFuente);
+        Escaner escaner = new Escaner(codigoFuente);
+
+        try {
+            parser.Inicia();
+            int i = 0;
+            String token = escaner.getToken(true); // Obtén el primer token
+            while (!token.equals("EOF")) {
+                String tipo = escaner.getTipo();
+
+                // Verifica si hay errores en la lista de errores y accede correctamente
+                String error = (i < parser.listaErrores.size()) ? parser.listaErrores.get(i) : "";
+
+                // Imprime el token y el error (si hay)
+                tableModel.addRow(new Object[] { token, tipo, error });
+                i++;
+
+                // Avanza al siguiente token
+                token = escaner.getToken(true); // Obtén el siguiente token
+            }
+        } catch (Exception e) {
+            mostrarError(e.getMessage());
         }
     }
 
