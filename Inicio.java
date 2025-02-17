@@ -118,6 +118,12 @@ public class Inicio extends JFrame {
                 token = escaner.getToken(true); // Obtén el siguiente token
             }
 
+            if (parser.listaErrores.stream().anyMatch(e -> e.startsWith("Error"))) {
+                JOptionPane.showMessageDialog(this, "Sintaxis incorrecta", "Resultado", JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Sintaxis correcta", "Resultado", JOptionPane.INFORMATION_MESSAGE);
+            }
+
         } catch (Exception e) {
 
         }

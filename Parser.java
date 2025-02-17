@@ -31,10 +31,10 @@ public class Parser {
     private void avanza() {
         this.token = escaner.getToken(true);
         listat.add(token); // Agregar el token a la lista
-        System.out.println(token);
     }
 
     public void Inicia() {
+
         listaErrores.add("Inicio del análisis sintáctico.");
         P();
         if (!token.equals("EOF")) {
@@ -48,7 +48,6 @@ public class Parser {
     }
 
     public void D() {
-        System.out.println("D" + token);
 
         while (token.equals(rInt) || token.equals(rString) || token.equals(rFloat)) {
             avanza();
@@ -68,12 +67,10 @@ public class Parser {
     }
 
     public void S() {
-        System.out.println("S" + token);
         switch (token) {
             case rif:
                 listaErrores.add("Correcto: 'if' encontrado.");
 
-                System.out.println("if" + token);
                 avanza();
                 C();
 
@@ -92,7 +89,6 @@ public class Parser {
 
             case rEnt:
                 listaErrores.add("Correcto: 'in >' encontrado.");
-                System.out.println("in entrada" + token);
                 avanza();
                 if (!escaner.getTipo().equals(rID)) {
                     listaErrores.add("Error: Se esperaba un identificador después de 'in >'.");
@@ -110,7 +106,6 @@ public class Parser {
 
             case rSal:
                 listaErrores.add("Correcto: 'out <' encontrado.");
-                System.out.println("out salida" + token);
                 avanza();
                 E();
                 if (!token.equals(rDelimitador)) {
@@ -122,7 +117,6 @@ public class Parser {
                 break;
 
             case "EOF":
-                System.out.println("EOF" + token);
                 break;
 
             default:
@@ -130,7 +124,6 @@ public class Parser {
                 if (escaner.getTipo().equals(rID)) {
 
                     listaErrores.add("Correcto: Identificador encontrado.");
-                    System.out.println("ID" + token);
                     avanza();
                     if (!token.equals(rIgual)) {
                         listaErrores.add("Error: Se esperaba '=' después del identificador.");
@@ -153,13 +146,11 @@ public class Parser {
     }
 
     public void E() {
-        System.out.println("E" + token);
 
         if (escaner.getTipo().equals(rID) || escaner.getTipo().equals(rNum)) {
 
             listaErrores.add("Correcto: Identificador o número encontrado.");
             avanza();
-            System.out.println("aqui queda creo  " + token);
 
             if (token.equals(rIgualdad) || token.equals(rDiferente) || token.equals(rMenor) ||
                     token.equals(rMenorIgual) || token.equals(rMayor) || token.equals(rMayorIgual)) {
@@ -188,7 +179,6 @@ public class Parser {
     }
 
     public void C() {
-        System.out.println("C" + token);
         E();
         if (!token.equals(rIgualdad) && !token.equals(rDiferente) && !token.equals(rMenor) &&
                 !token.equals(rMenorIgual) && !token.equals(rMayor) && !token.equals(rMayorIgual)) {
