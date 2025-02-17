@@ -8,6 +8,7 @@ public class Escaner {
     private List<String> operadores = Arrays.asList("+", "-", "*", "/", "=");
     private List<String> comparadores = Arrays.asList("==", "!=", "<", "<=", ">", ">=");
     private String delimitador = ";";
+
     private int i;
     private String tipo;
 
@@ -86,6 +87,14 @@ public class Escaner {
     // comillas en un solo token
     // AGREGAR LO ANTERIOR
 
+    private boolean esCadena(String token) {
+        if (token.matches("\"[a-zA-Z0-9]*\"")) {
+            this.tipo = "Cadena";
+            return true;
+        }
+        return false;
+    }
+
     public String getToken(boolean sigue) {
         if (i >= tokens.length) {
             this.tipo = "Fin de código";
@@ -107,7 +116,7 @@ public class Escaner {
                 esComparador(tokenActual) ||
                 esDelimitador(tokenActual) ||
                 esIdentificador(tokenActual) ||
-                esNumero(tokenActual);
+                esNumero(tokenActual) || esCadena(tokenActual);
 
         if (sigue) {
             i++;

@@ -10,7 +10,7 @@ E ->	ID | num | E + E | E - E | E * E | E / E
 C ->	E IN E
 IN ->	== | != | < | <= | > | >= 
 ID ->	letra (letra | digito)*
-cadena -> " (letra | digito | espacio)* "    
+cadena -> "(letra | digito | espacio)*"    
 num ->	digitos frac
 frac -> 		. digitos | ε
 digitos -> 	digito digito*

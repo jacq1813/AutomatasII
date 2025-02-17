@@ -108,7 +108,7 @@ public class Inicio extends JFrame {
                 String tipo = escaner.getTipo();
 
                 // Verifica si hay errores en la lista de errores y accede correctamente
-                String error = (i < parser.listaErrores.size()) ? parser.listaErrores.get(i) : "";
+                String error = (i <= parser.listaErrores.size()) ? parser.listaErrores.get(i) : "";
 
                 // Imprime el token y el error (si hay)
                 tableModel.addRow(new Object[] { token, tipo, error });
@@ -117,8 +117,9 @@ public class Inicio extends JFrame {
                 // Avanza al siguiente token
                 token = escaner.getToken(true); // Obtén el siguiente token
             }
+
         } catch (Exception e) {
-            mostrarError(e.getMessage());
+
         }
     }
 

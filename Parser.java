@@ -13,7 +13,7 @@ public class Parser {
     private final String rInt = "int", rFloat = "float", rString = "string", rID = "Identificador", rEnt = "in >",
             rSal = "out <", rif = "if", rThen = "then", rElse = "else", rSuma = "+", rResta = "-", rMult = "*",
             rDiv = "/", rIgual = "=", rIgualdad = "==", rDiferente = "!=", rMenor = "<", rMenorIgual = "<=",
-            rMayor = ">", rMayorIgual = ">=", rDelimitador = ";", rNum = "Numero";
+            rMayor = ">", rMayorIgual = ">=", rDelimitador = ";", rNum = "Numero", rCadena = "Cadena";
 
     public Parser(String codigo) {
         try {
@@ -76,6 +76,7 @@ public class Parser {
                 System.out.println("if" + token);
                 avanza();
                 C();
+
                 if (!token.equals(rThen)) {
                     listaErrores.add("Error: Se esperaba 'then' después de la condición.");
                 } else {
@@ -127,6 +128,7 @@ public class Parser {
             default:
 
                 if (escaner.getTipo().equals(rID)) {
+
                     listaErrores.add("Correcto: Identificador encontrado.");
                     System.out.println("ID" + token);
                     avanza();
@@ -152,9 +154,18 @@ public class Parser {
 
     public void E() {
         System.out.println("E" + token);
+
         if (escaner.getTipo().equals(rID) || escaner.getTipo().equals(rNum)) {
+
             listaErrores.add("Correcto: Identificador o número encontrado.");
             avanza();
+            System.out.println("aqui queda creo  " + token);
+
+            if (token.equals(rIgualdad) || token.equals(rDiferente) || token.equals(rMenor) ||
+                    token.equals(rMenorIgual) || token.equals(rMayor) || token.equals(rMayorIgual)) {
+                return; // Salir de E() para que C() maneje la comparación
+            }
+
             while (token.equals(rSuma) || token.equals(rResta) || token.equals(rMult) || token.equals(rDiv)) {
                 listaErrores.add("Correcto: Operador aritmético encontrado.");
                 avanza();
@@ -165,6 +176,12 @@ public class Parser {
                 }
                 avanza();
             }
+            return;
+        }
+        if (escaner.getTipo().equals(rCadena)) {
+            listaErrores.add("Correcto: Cadena encontrada.");
+            avanza();
+            return;
         } else {
             listaErrores.add("Error: Se esperaba una expresión válida.");
         }
@@ -181,5 +198,7 @@ public class Parser {
         }
         avanza();
         E();
+
+        return;
     }
 }
