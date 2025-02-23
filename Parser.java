@@ -153,7 +153,7 @@ public class Parser {
 
     public void E() {
 
-        if (escaner.getTipo().equals(rID) || escaner.getTipo().equals(rNum)) {
+        if (escaner.getTipo().equals(rID) || escaner.getTipo().equals(rNum) || escaner.getTipo().equals(rNumn)) {
 
             listaErrores.add("Correcto: Identificador o número encontrado.");
             avanza();
@@ -166,7 +166,8 @@ public class Parser {
             while (token.equals(rSuma) || token.equals(rResta) || token.equals(rMult) || token.equals(rDiv)) {
                 listaErrores.add("Correcto: Operador aritmético encontrado.");
                 avanza();
-                if (!escaner.getTipo().equals(rID) && !escaner.getTipo().equals(rNum)) {
+                if (!escaner.getTipo().equals(rID) && !escaner.getTipo().equals(rNum)
+                        && !escaner.getTipo().equals(rNumn)) {
                     listaErrores.add("Error: Se esperaba un identificador o número.");
                 } else {
                     listaErrores.add("Correcto: Identificador o número válido.");

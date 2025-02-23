@@ -107,11 +107,14 @@ public class Inicio extends JFrame {
             parser.Inicia();
             int i = 0;
             String token = escaner.getToken(true); // Obtén el primer token
+            // System.out.println("entro a analizar codigo");
+
             while (!token.equals("EOF")) {
+                // System.out.println("entro al while " + token + " " + i);
                 String tipo = escaner.getTipo();
 
                 // Verifica si hay errores en la lista de errores y accede correctamente
-                String error = (i <= errores.size()) ? errores.get(i) : "";
+                String error = (i < errores.size()) ? errores.get(i) : "";
 
                 // Imprime el token y el error (si hay)
                 tableModel.addRow(new Object[] { token, tipo, error });
@@ -119,8 +122,10 @@ public class Inicio extends JFrame {
 
                 // Avanza al siguiente token
                 token = escaner.getToken(true);
+                // System.out.println("verificando token");
             }
 
+            // System.out.println("entro a semantico"); // nunca entra aqui
             Semantico semantico = new Semantico(parser);
 
             if (errores.stream().anyMatch(e -> e.startsWith("Error"))) {
@@ -130,6 +135,7 @@ public class Inicio extends JFrame {
             }
             System.out.println(semantico.tokens);
         } catch (Exception e) {
+            e.printStackTrace();
 
         }
 
