@@ -66,7 +66,16 @@ public class Escaner {
     }
 
     private boolean esNumero(String token) {
-        if (token.matches("\\d+(\\.\\d+)?")) {
+        if (token.matches("\\d+\\.\\d+")) {
+            this.tipo = "Numero decimal";
+            return true;
+        }
+        return false;
+    }
+
+    // para numeros sin decimales
+    private boolean esNumeron(String token) {
+        if (token.matches("\\d+")) {
             this.tipo = "Numero";
             return true;
         }
@@ -116,7 +125,7 @@ public class Escaner {
                 esComparador(tokenActual) ||
                 esDelimitador(tokenActual) ||
                 esIdentificador(tokenActual) ||
-                esNumero(tokenActual) || esCadena(tokenActual);
+                esNumero(tokenActual) || esNumeron(tokenActual) || esCadena(tokenActual);
 
         if (sigue) {
             i++;

@@ -1,19 +1,24 @@
+// LENGUAJES Y AUTÓMATAS II                                                     
+// JACQUELIN ROBLES RIOS
+// 12 PM - 01 PM  
+
 import java.util.List;
 import java.util.ArrayList;
 
 public class Parser {
 
-    Escaner escaner;
-    String token;
+    private Escaner escaner;
+    private String token;
 
     // lista de tokens que guarda el token y el error (si lo hay)
     List<String> listat = new ArrayList<>();
-    List<String> listaErrores = new ArrayList<>();
+    private List<String> listaErrores = new ArrayList<>();
 
     private final String rInt = "int", rFloat = "float", rString = "string", rID = "Identificador", rEnt = "in >",
             rSal = "out <", rif = "if", rThen = "then", rElse = "else", rSuma = "+", rResta = "-", rMult = "*",
             rDiv = "/", rIgual = "=", rIgualdad = "==", rDiferente = "!=", rMenor = "<", rMenorIgual = "<=",
-            rMayor = ">", rMayorIgual = ">=", rDelimitador = ";", rNum = "Numero", rCadena = "Cadena";
+            rMayor = ">", rMayorIgual = ">=", rDelimitador = ";", rNum = "Numero decimal", rNumn = "Numero",
+            rCadena = "Cadena";
 
     public Parser(String codigo) {
         try {
@@ -45,6 +50,7 @@ public class Parser {
     public void P() {
         D();
         S();
+
     }
 
     public void D() {
@@ -190,5 +196,13 @@ public class Parser {
         E();
 
         return;
+    }
+
+    public List<String> getListaErrores() {
+        return listaErrores;
+    }
+
+    public List<String> getListaTokens() {
+        return listat;
     }
 }

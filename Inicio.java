@@ -3,6 +3,7 @@ import java.io.*;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
+import java.util.List;
 
 public class Inicio extends JFrame {
 
@@ -10,6 +11,7 @@ public class Inicio extends JFrame {
     private JTable tokensResultado;
     private DefaultTableModel tableModel;
     private JButton analizar;
+    List<String> errores;
 
     public Inicio() {
         setTitle("Lenguaje J");
@@ -99,6 +101,7 @@ public class Inicio extends JFrame {
         String codigoFuente = codigo.getText();
         Parser parser = new Parser(codigoFuente);
         Escaner escaner = new Escaner(codigoFuente);
+        errores = parser.getListaErrores();
 
         try {
             parser.Inicia();
@@ -108,25 +111,28 @@ public class Inicio extends JFrame {
                 String tipo = escaner.getTipo();
 
                 // Verifica si hay errores en la lista de errores y accede correctamente
-                String error = (i <= parser.listaErrores.size()) ? parser.listaErrores.get(i) : "";
+                String error = (i <= errores.size()) ? errores.get(i) : "";
 
                 // Imprime el token y el error (si hay)
                 tableModel.addRow(new Object[] { token, tipo, error });
                 i++;
 
                 // Avanza al siguiente token
-                token = escaner.getToken(true); // Obtén el siguiente token
+                token = escaner.getToken(true);
             }
 
-            if (parser.listaErrores.stream().anyMatch(e -> e.startsWith("Error"))) {
+            Semantico semantico = new Semantico(parser);
+
+            if (errores.stream().anyMatch(e -> e.startsWith("Error"))) {
                 JOptionPane.showMessageDialog(this, "Sintaxis incorrecta", "Resultado", JOptionPane.ERROR_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "Sintaxis correcta", "Resultado", JOptionPane.INFORMATION_MESSAGE);
             }
-
+            System.out.println(semantico.tokens);
         } catch (Exception e) {
 
         }
+
     }
 
     private void mostrarError(String mensaje) {
@@ -136,5 +142,6 @@ public class Inicio extends JFrame {
     public static void main(String[] args) {
         Inicio ide = new Inicio();
         ide.setVisible(true);
+
     }
 }
