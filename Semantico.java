@@ -27,6 +27,7 @@ public class Semantico {
                     declaracion.add(tokens.get(i)); // Identificador
                 if (++i < tokens.size() && tokens.get(i).equals(";")) {
                     declaraciones.add(declaracion);
+
                 }
             } else {
                 break;
@@ -71,6 +72,53 @@ public class Semantico {
                 String valor = tokens.get(i);
                 System.out.println("Valor: " + valor);
 
+                Escaner e = new Escaner(tokens.get(i + 1));
+                System.out.println("Token: " + tokens.get(i + 1));
+                e.getToken(true);
+                System.out.println("Tipo: " + e.getTipo());
+
+                while (e.getTipo().equals("Operador")) {
+                    i++;
+                    String ope = tokens.get(i);
+
+                    e = new Escaner(tokens.get(i + 1));
+                    e.getToken(true);
+
+                    if (e.getTipo().equals("Numero")) {
+                        System.out.println("Operadors: " + ope);
+
+                        switch (ope) {
+                            case "+":
+                                valor = String.valueOf(Integer.parseInt(valor) + Integer.parseInt(tokens.get(i + 1)));
+                                i++;
+                                break;
+                            case "-":
+                                valor = String.valueOf(Integer.parseInt(valor) - Integer.parseInt(tokens.get(i + 1)));
+                                i++;
+                                break;
+                            case "*":
+                                valor = String.valueOf(Integer.parseInt(valor) * Integer.parseInt(tokens.get(i + 1)));
+                                i++;
+                                break;
+                            case "/":
+                                valor = String.valueOf(Integer.parseInt(valor) / Integer.parseInt(tokens.get(i + 1)));
+                                i++;
+                                break;
+                            default:
+                                break;
+
+                        }
+                    } else {
+                        errores.add("Error: Operación no válida.");
+                        System.out.println("Error: Operación no válida.");
+                    }
+                    e = new Escaner(tokens.get(i + 1));
+                    e.getToken(true);
+
+                    System.out.print("Tipo fff: " + e.getTipo());
+                }
+
+                System.out.println("otra cosa    ");
                 String tipo = obtenerTipoDeclaracion(id);
 
                 System.out.println("Tipo: " + tipo);
@@ -116,15 +164,28 @@ public class Semantico {
 
     private void procesarCondicional() {
         if (++i < tokens.size()) {
+
             String condicion = tokens.get(i);
-            String tipo = obtenerTipoDeclaracion(condicion);
-            if (tipo != null) {
-                System.out.println("Correcto: La variable " + condicion + " está declarada.");
+            System.out.println("Condición: " + condicion);
 
-            } else {
+            Escaner e = new Escaner(condicion);
+            e.getToken(true);
 
-                errores.add("Error: La variable " + condicion + " no está declarada.");
-                System.out.println("Error: La variable " + condicion + " no está declarada.");
+            if (e.getTipo().equals("Identificador")) {
+
+                String tipo = obtenerTipoDeclaracion(condicion);
+
+                if (tipo != null) {
+                    System.out.println("Correcto: La variable " + condicion + " está declarada.");
+
+                } else {
+
+                    errores.add("Error: La variable " + condicion + " no está declarada.");
+                    System.out.println("Error: La variable " + condicion + " no está declarada.");
+                }
+            }
+            if (e.getTipo().equals("Numero") || e.getTipo().equals("Numero decimal")) {
+                System.out.println("Correcto: La condición es un número.");
             }
         }
         i++;
