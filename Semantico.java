@@ -16,12 +16,12 @@ public class Semantico {
     }
 
     private void procesarDeclaraciones() {
-        int conD = 0;
+
         for (i = 0; i < tokens.size(); i++) {
             String token = tokens.get(i);
             if (esTipoDato(token)) {
                 List<String> declaracion = new ArrayList<>();
-                conD++;
+
                 declaracion.add(token); // Tipo de dato
                 if (++i < tokens.size())
                     declaracion.add(tokens.get(i)); // Identificador
@@ -56,7 +56,8 @@ public class Semantico {
                 procesarSalida(tokenActual);
             } else if (tokens.get(i).equals("if") || escaner.getTipo().equals("Operador relacional")) {
                 procesarCondicional();
-            } else if (tokens.get(i).equals("else") || tokens.get(i).equals("then")) {
+            } else if ((tokens.get(i).equals("else") || tokens.get(i).equals("then"))) {
+                System.out.println("Else/Then: " + tokens.get(i));
                 procesarElseThen();
             } else {
                 i++;
@@ -197,8 +198,8 @@ public class Semantico {
     private void procesarEntrada(String id) {
         if (++i < tokens.size()) {
             String valor = tokens.get(i);
-            String tipo = obtenerTipoDeclaracion(id);
-            validarCompatibilidad(id, tipo, valor);
+            System.out.println("Entrada: " + valor);
+            obtenerTipoDeclaracion(valor);
         }
         i++;
     }
@@ -242,17 +243,23 @@ public class Semantico {
 
     private void procesarElseThen() {
 
-        if (++i < tokens.size() && (tokens.get(i).equals("then") || tokens.get(i).equals("else"))) {
+        if (++i < tokens.size()) {
             String ife = tokens.get(i);
-            String tipo = obtenerTipoDeclaracion(ife);
+            System.out.println("Else/Thens: " + ife);
 
-            if (tipo != null) {
-                System.out.println("Correcto: La variable " + ife + " está declarada.");
+            Escaner e = new Escaner(ife);
+            e.getToken(true);
+            System.out.println("Tipo: " + e.getTipo());
 
-            } else {
-                errores.add("Error: La variable " + ife + " no está declarada.");
-                System.out.println("Error: La variable " + ife + " no está declarada.");
+            if (e.getTipo().equals("Identificador")) {
+
+                String tipo = obtenerTipoDeclaracion(ife);
+                System.out.println("Token valor: " + tokens.get(i + 2));
+
+                validarCompatibilidad(ife, tipo, tokens.get(i + 2));
             }
+
+            i++;
         }
 
     }
@@ -262,8 +269,8 @@ public class Semantico {
             Escaner escaner = new Escaner(valor);
             escaner.getToken(true);
             if (!esCompatible(tipo, escaner.getTipo())) {
-                errores.add("Error: Asignación incompatible para " + id);
-                System.out.println("Error: Asignación incompatible para " + id);
+                errores.add("Error: Asignación de " + valor + "incompatible para " + id);
+                System.out.println("Error: Asignación de " + valor + "incompatible para " + id);
             } else {
 
                 System.out.println("Correcto: Asignación compatible para " + id);
