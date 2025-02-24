@@ -89,19 +89,67 @@ public class Semantico {
 
                         switch (ope) {
                             case "+":
-                                valor = String.valueOf(Integer.parseInt(valor) + Integer.parseInt(tokens.get(i + 1)));
+                                e = new Escaner(tokens.get(i + 1));
+                                e.getToken(true);
+                                String tipo = e.getTipo();
+
+                                if (tipo.equals("Numero")) {
+                                    valor = String
+                                            .valueOf(Integer.parseInt(valor) + Integer.parseInt(tokens.get(i + 1)));
+
+                                } else {
+                                    errores.add(
+                                            "Error: Operación no válida, no se pueden sumar un número con una cadena.");
+                                    System.out.println("Error: Operación no válida.");
+                                }
                                 i++;
                                 break;
                             case "-":
-                                valor = String.valueOf(Integer.parseInt(valor) - Integer.parseInt(tokens.get(i + 1)));
+                                e = new Escaner(tokens.get(i + 1));
+                                e.getToken(true);
+                                tipo = e.getTipo();
+
+                                if (tipo.equals("Numero")) {
+                                    valor = String
+                                            .valueOf(Integer.parseInt(valor) + Integer.parseInt(tokens.get(i + 1)));
+
+                                } else {
+                                    errores.add(
+                                            "Error: Operación no válida, no se pueden sumar un número con una cadena.");
+                                    System.out.println("Error: Operación no válida.");
+                                }
                                 i++;
                                 break;
                             case "*":
-                                valor = String.valueOf(Integer.parseInt(valor) * Integer.parseInt(tokens.get(i + 1)));
+                                e = new Escaner(tokens.get(i + 1));
+                                e.getToken(true);
+                                tipo = e.getTipo();
+
+                                if (tipo.equals("Numero")) {
+                                    valor = String
+                                            .valueOf(Integer.parseInt(valor) + Integer.parseInt(tokens.get(i + 1)));
+
+                                } else {
+                                    errores.add(
+                                            "Error: Operación no válida, no se pueden sumar un número con una cadena.");
+                                    System.out.println("Error: Operación no válida.");
+                                }
                                 i++;
                                 break;
                             case "/":
-                                valor = String.valueOf(Integer.parseInt(valor) / Integer.parseInt(tokens.get(i + 1)));
+                                e = new Escaner(tokens.get(i + 1));
+                                e.getToken(true);
+                                tipo = e.getTipo();
+
+                                if (tipo.equals("Numero")) {
+                                    valor = String
+                                            .valueOf(Integer.parseInt(valor) + Integer.parseInt(tokens.get(i + 1)));
+
+                                } else {
+                                    errores.add(
+                                            "Error: Operación no válida, no se pueden sumar un número con una cadena.");
+                                    System.out.println("Error: Operación no válida.");
+                                }
                                 i++;
                                 break;
                             default:
@@ -111,6 +159,7 @@ public class Semantico {
                     } else {
                         errores.add("Error: Operación no válida.");
                         System.out.println("Error: Operación no válida.");
+                        valor = "";
                     }
                     e = new Escaner(tokens.get(i + 1));
                     e.getToken(true);
