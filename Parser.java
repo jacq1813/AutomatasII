@@ -49,6 +49,10 @@ public class Parser {
 
     public void P() {
         D();
+        if (token.equals("EOF")) {
+            listaErrores.add("Error: se esperaba una sentencia.");
+            return;
+        }
         S();
 
     }
@@ -144,6 +148,8 @@ public class Parser {
                         listaErrores.add("Correcto: ';' al final de la asignación.");
                     }
                     avanza();
+                    // para que puedan agregar más sentencias
+                    // S();
                     break;
                 } else {
                     listaErrores.add("Error: Se esperaba una sentencia válida.");

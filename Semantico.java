@@ -2,221 +2,188 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Semantico {
-    List<String> tokens;
-    Parser parser;
-    int i;
-
-    // matriz para guardar los valores de las declaraciones con su tipo, nombre y
-    // valor
-    List<List<String>> declaraciones = new ArrayList<>();
+    private List<String> tokens;
+    private Parser parser;
+    private int i;
+    List<String> errores = new ArrayList<>();
+    List<List<String>> declaraciones = new ArrayList<>(); // Almacena las declaraciones
 
     public Semantico(Parser parser) {
-        System.out.println("entro a semantico2 ");
         this.parser = parser;
         tokens = parser.getListaTokens();
-        System.out.println("recibe " + tokens);
-        declaraciones();
-        valoresDeclaraciones();
-
+        procesarDeclaraciones();
+        analizarValores();
     }
 
-    // si estan declarados
-    public void declaraciones() {
-
-        System.out.println("estoy en declaraciones");
-
-        for (i = 0; i < tokens.size(); i++) { // Recorremos la lista con un índice
-            System.out.println("entro : " + i);
-            System.out.println("token actual for:" + tokens.get(i));
-            if (tokens.get(i).equals("int") || tokens.get(i).equals("float") || tokens.get(i).equals("string")) {
-
+    private void procesarDeclaraciones() {
+        int conD = 0;
+        for (i = 0; i < tokens.size(); i++) {
+            String token = tokens.get(i);
+            if (esTipoDato(token)) {
                 List<String> declaracion = new ArrayList<>();
-                declaracion.add(tokens.get(i)); // Guardamos el tipo de dato
-                System.out.println(tokens.get(i));
-                i++; // Avanzamos al siguiente token
-                declaracion.add(tokens.get(i));
-                System.out.println(tokens.get(i));
-                i++; // Avanzamos al siguiente token
-
-                if (tokens.get(i).equals(";")) {
-                    System.out.println(declaracion);
+                conD++;
+                declaracion.add(token); // Tipo de dato
+                if (++i < tokens.size())
+                    declaracion.add(tokens.get(i)); // Identificador
+                if (++i < tokens.size() && tokens.get(i).equals(";")) {
                     declaraciones.add(declaracion);
-
-                    if (i + 1 < tokens.size() && (tokens.get(i + 1).equals("int") || tokens.get(i + 1).equals("float")
-                            || tokens.get(i + 1).equals("string"))) {
-
-                        // aqui quite un i++ que estaba de mas
-                        System.out.println("siguiente: " + tokens.get(i));
-                        System.out.println("siguiente: " + i);
-                        continue;
-                    } else {
-                        // i++;
-                        System.out.println("siguiente: " + tokens.get(i));
-                        System.out.println("siguiente: " + i);
-                        break;
-                    }
                 }
+            } else {
+                break;
             }
         }
-
-        // imprimir la lista declaraciones
-        for (List<String> decla : declaraciones) {
-            for (String dec : decla) {
-                System.out.println(dec);
-            }
-        }
-
     }
 
-    public void valoresDeclaraciones() {
-        while (i < tokens.size() - 1) {
+    private void analizarValores() {
+        while (i < tokens.size()) {
             String tokenActual = tokens.get(i);
-            Escaner escane = new Escaner(tokenActual);
-            escane.getToken(true);
-
+            Escaner escaner = new Escaner(tokenActual);
+            escaner.getToken(true);
             System.out.println("Token actual: " + tokenActual);
-            System.out.println("Tipo: " + escane.getTipo());
+            System.out.println("Tipo: " + escaner.getTipo());
 
-            if (escane.getTipo().equals("Identificador")) { // Si es un identificador
-                String id = tokenActual;
-                System.out.println("Identificador: " + id);
+            if (esIdentificador(escaner) && !(tokens.get(i - 1).equals("then") || tokens.get(i - 1).equals("else"))) {
+
+                System.out.println("Identificadores sin else o then");
+                System.out.println("aqui " + tokenActual);
+                System.out.println(tokens.get(i - 1));
+
+                procesarAsignacion(tokenActual);
+            } else if (tokens.get(i).equals("in >")) {
+                procesarEntrada(tokenActual);
+            } else if (tokens.get(i).equals("out <")) {
+                procesarSalida(tokenActual);
+            } else if (tokens.get(i).equals("if") || escaner.getTipo().equals("Operador relacional")) {
+                procesarCondicional();
+            } else if (tokens.get(i).equals("else") || tokens.get(i).equals("then")) {
+                procesarElseThen();
+            } else {
                 i++;
-
-                if (i < tokens.size() && tokens.get(i).equals("=")) { // Si hay una asignación
-                    System.out.println("Asignación " + tokens.get(i));
-                    i++;
-                    String valor = tokens.get(i); // Tomamos el valor asignado
-                    System.out.println("Valor: " + valor);
-                    String tipo = obtenerTipoDeclaracion(id); // Obtener el tipo del identificador
-                    System.out.println("Tipo: " + tipo);
-
-                    if (tipo != null) { // Si el identificador está declarado
-                        Escaner escaner = new Escaner(valor);
-                        escaner.getToken(true); // Analizar el valor
-                        System.out.println("Tipo valor: " + escaner.getTipo());
-                        System.out.println("Valor: " + escane.getToken(true));
-                        if (!esCompatible(tipo, escaner.getTipo())) { // Validar compatibilidad
-                            System.out.println("Error: Asignación incompatible para " + id);
-                        } else {
-                            System.out.println("Correcto: Asignación compatible para " + id);
-                        }
-                    } else {
-                        System.out.println("Error: La variable " + id + " no está declarada.");
-                    }
-
-                    i++; // Avanzar después del valor
-                }
-
             }
+        }
+    }
 
-            // si es una entrada, aqui no estoy segura de como deba ser ya que la entrada la
-            // da el usuario cosa que todabia no se como hacer
-            if (i < tokens.size() && tokens.get(i).equals("in >")) {
-                String id = tokenActual;
-                System.out.println("Identificador: " + id);
-                i++;
+    private void procesarAsignacion(String id) {
+        if (++i < tokens.size() && tokens.get(i).equals("=")) {
+            System.out.println("Asignación: " + id + " = " + tokens.get(i));
+            if (++i < tokens.size()) {
 
-                System.out.println("Entrada: " + tokens.get(i));
-                i++;
-                String valor = tokens.get(i); // Tomamos el valor asignado
+                String valor = tokens.get(i);
                 System.out.println("Valor: " + valor);
-                String tipo = obtenerTipoDeclaracion(id); // Obtener el tipo del identificador
-                System.out.println("Tipo: " + tipo);
 
-                if (tipo != null) { // Si el identificador está declarado
-                    Escaner escaner = new Escaner(valor);
-                    escaner.getToken(true); // Analizar el valor
-                    System.out.println("Tipo valor: " + escaner.getTipo());
-                    System.out.println("Valor: " + escane.getToken(true));
-                    if (!esCompatible(tipo, escaner.getTipo())) { // Validar compatibilidad
-                        System.out.println("Error: Asignación incompatible para " + id);
-                    } else {
-                        System.out.println("Correcto: Asignación compatible para " + id);
-                    }
+                String tipo = obtenerTipoDeclaracion(id);
+
+                System.out.println("Tipo: " + tipo);
+                if (tipo != null) {
+
+                    validarCompatibilidad(id, tipo, valor);
+                    BuscarDeclaraciones(id, valor);
+
                 } else {
+                    errores.add("Error: La variable " + id + " no está declarada.");
                     System.out.println("Error: La variable " + id + " no está declarada.");
                 }
-                i++;
-                // Avanzar después del valor
             }
-            if (i < tokens.size() && tokens.get(i).equals("out <")) {
-                String id = tokenActual;
-                System.out.println("Identificador: " + id);
-                i++;
-                System.out.println("Salida: " + tokens.get(i));
-                // obtener el tipo de tokens.get(i)
+        }
+        i++;
+    }
 
-                Escaner s = new Escaner(tokens.get(i));
-                String tip = s.getToken(true);
-                System.out.println("Tipo: " + s.getTipo());
+    public void BuscarDeclaraciones(String id, String valor) {
 
-                if (s.getTipo() == "Identificador") {
-                    System.out.println("Entrada: " + tokens.get(i));
-
-                    String tipo = obtenerTipoDeclaracion(tip); // Obtener el tipo del identificador
-                    System.out.println("Tipo: " + tipo);
-
-                    if (tipo != null) { // Si el identificador está declarado
-                        System.out.println("Correcto: La variable " + id + " está declaradaTATA.");
-                    } else {
-                        System.out.println("Error: La variable " + id + " no está declarada.");
-                    }
-                    i++; // Avanzar después del valor
-                }
-
-                System.out.println("Salida: " + tokens.get(i));
-                i++;
-                String valor = tokens.get(i); // Tomamos el valor asignado
-                System.out.println("Valor: " + valor);
-
-                i++; // Avanzar después del valor
-            }
-            if (i < tokens.size() && (tokens.get(i).equals("if") || escane.getTipo().equals("Operador relacional"))) {
-
-                System.out.println("if: " + tokens.get(i));
-                i++;
-                System.out.println("siguiente " + tokens.get(i));
-
-                Escaner s = new Escaner(tokens.get(i));
-                String tip = s.getToken(true);
-                System.out.println("Tipo: " + s.getTipo());
-
-                if (s.getTipo().equals("Identificador")) {
-                    // VERIFICAR SI EL IDENTIFICADOR ESTA DECLARADO
-                    String tipo = obtenerTipoDeclaracion(tip); // Obtener el tipo del identificador
-                    System.out.println("Tipo: " + tipo);
-
-                    if (tipo != null) { // Si el identificador está declarado
-                        System.out.println("Correcto: La variable " + tip + " está declarada.IFFF");
-                    } else {
-                        System.out.println("Error: La variable " + tip + " no está declarada.");
-                    }
-                }
-                i++;
-                System.out.println("dentro del inf siguiente " + tokens.get(i));
-
-            } else {
-                i++; // Seguir al siguiente token
+        for (List<String> declaracion : declaraciones) {
+            if (declaracion.contains(id)) {
+                declaracion.add(valor);
             }
         }
     }
 
-    // Método para obtener el tipo de una variable declarada
+    private void procesarEntrada(String id) {
+        if (++i < tokens.size()) {
+            String valor = tokens.get(i);
+            String tipo = obtenerTipoDeclaracion(id);
+            validarCompatibilidad(id, tipo, valor);
+        }
+        i++;
+    }
+
+    private void procesarSalida(String id) {
+        if (++i < tokens.size()) {
+            String valor = tokens.get(i);
+            System.out.println("Salida: " + valor);
+        }
+        i++;
+    }
+
+    private void procesarCondicional() {
+        if (++i < tokens.size()) {
+            String condicion = tokens.get(i);
+            String tipo = obtenerTipoDeclaracion(condicion);
+            if (tipo != null) {
+                System.out.println("Correcto: La variable " + condicion + " está declarada.");
+
+            } else {
+
+                errores.add("Error: La variable " + condicion + " no está declarada.");
+                System.out.println("Error: La variable " + condicion + " no está declarada.");
+            }
+        }
+        i++;
+    }
+
+    private void procesarElseThen() {
+
+        if (++i < tokens.size() && (tokens.get(i).equals("then") || tokens.get(i).equals("else"))) {
+            String ife = tokens.get(i);
+            String tipo = obtenerTipoDeclaracion(ife);
+
+            if (tipo != null) {
+                System.out.println("Correcto: La variable " + ife + " está declarada.");
+
+            } else {
+                errores.add("Error: La variable " + ife + " no está declarada.");
+                System.out.println("Error: La variable " + ife + " no está declarada.");
+            }
+        }
+
+    }
+
+    private void validarCompatibilidad(String id, String tipo, String valor) {
+        if (tipo != null) {
+            Escaner escaner = new Escaner(valor);
+            escaner.getToken(true);
+            if (!esCompatible(tipo, escaner.getTipo())) {
+                errores.add("Error: Asignación incompatible para " + id);
+                System.out.println("Error: Asignación incompatible para " + id);
+            } else {
+
+                System.out.println("Correcto: Asignación compatible para " + id);
+            }
+        } else {
+            errores.add("Error: La variable " + id + " no está declarada.");
+            System.out.println("Error: La variable " + id + " no está declarada.");
+        }
+    }
+
     private String obtenerTipoDeclaracion(String id) {
         for (List<String> declaracion : declaraciones) {
             if (declaracion.get(1).equals(id)) {
-                return declaracion.get(0); // Retorna el tipo
-
+                return declaracion.get(0);
             }
         }
-        return null; // No está declarada
+        return null;
     }
 
-    // Método para validar si el tipo del valor coincide con el tipo de la variable
     private boolean esCompatible(String tipo, String tipoValor) {
         return (tipo.equals("int") && tipoValor.equals("Numero")) ||
                 (tipo.equals("float") && tipoValor.equals("Numero decimal")) ||
                 (tipo.equals("string") && tipoValor.equals("Cadena"));
     }
 
+    private boolean esTipoDato(String token) {
+        return token.equals("int") || token.equals("float") || token.equals("string");
+    }
+
+    private boolean esIdentificador(Escaner escaner) {
+        return escaner.getTipo().equals("Identificador");
+    }
 }

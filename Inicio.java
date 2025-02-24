@@ -6,12 +6,12 @@ import javax.swing.table.DefaultTableModel;
 import java.util.List;
 
 public class Inicio extends JFrame {
-
-    private JTextArea codigo;
-    private JTable tokensResultado;
-    private DefaultTableModel tableModel;
+    private JTextArea codigo, consola;
+    private JTable tokensResultado, declaracionesTabla;
+    private DefaultTableModel tokensModel, declaracionesModel;
     private JButton analizar;
     List<String> errores;
+    List<String> erroresS;
 
     public Inicio() {
         setTitle("Lenguaje J");
@@ -19,7 +19,6 @@ public class Inicio extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Crear la barra de menú
         JMenuBar menuBar = new JMenuBar();
         JMenu menuArchivo = new JMenu("Archivo");
 
@@ -27,7 +26,6 @@ public class Inicio extends JFrame {
         JMenuItem menuAbrir = new JMenuItem("Abrir");
         JMenuItem menuGuardar = new JMenuItem("Guardar");
 
-        // Agregar acciones a los menús
         menuNuevo.addActionListener(e -> limpiarTodo());
         menuAbrir.addActionListener(e -> abrirArchivo());
         menuGuardar.addActionListener(e -> guardarArchivo());
@@ -37,32 +35,48 @@ public class Inicio extends JFrame {
         menuArchivo.add(menuGuardar);
         menuBar.add(menuArchivo);
 
-        // area para escribir el código
         codigo = new JTextArea(20, 30);
         JScrollPane scrollCodigo = new JScrollPane(codigo);
 
-        // tabla de tokens y tipos
-        String[] columnas = { "Token", "Tipo", "Error" };
-        tableModel = new DefaultTableModel(columnas, 0);
-        tokensResultado = new JTable(tableModel);
-        JScrollPane scrollTabla = new JScrollPane(tokensResultado);
+        tokensModel = new DefaultTableModel(new String[] { "Token", "Tipo", "Error" }, 0);
+        tokensResultado = new JTable(tokensModel);
+        JScrollPane scrollTokens = new JScrollPane(tokensResultado);
+
+        declaracionesModel = new DefaultTableModel(new String[] { "Tipo", "Nombre", "Valor" }, 0);
+        declaracionesTabla = new JTable(declaracionesModel);
+        JScrollPane scrollDeclaraciones = new JScrollPane(declaracionesTabla);
+
+        consola = new JTextArea(5, 50);
+        consola.setEditable(false);
+        JScrollPane scrollConsola = new JScrollPane(consola);
 
         analizar = new JButton("Analizar");
         analizar.addActionListener(e -> analizarCodigo());
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollCodigo, scrollTabla);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollCodigo, scrollTokens);
         splitPane.setDividerLocation(300);
+
+        JPanel panelTablas = new JPanel(new GridLayout(2, 1));
+        panelTablas.add(scrollTokens);
+        panelTablas.add(scrollDeclaraciones);
+
+        JPanel panelInferior = new JPanel(new BorderLayout());
+        panelInferior.add(scrollConsola, BorderLayout.CENTER);
+        panelInferior.add(analizar, BorderLayout.SOUTH);
 
         setJMenuBar(menuBar);
         add(splitPane, BorderLayout.CENTER);
-        add(analizar, BorderLayout.SOUTH);
+        add(panelTablas, BorderLayout.EAST);
+        add(panelInferior, BorderLayout.SOUTH);
 
         setVisible(true);
     }
 
     private void limpiarTodo() {
         codigo.setText("");
-        tableModel.setRowCount(0);
+        tokensModel.setRowCount(0);
+        declaracionesModel.setRowCount(0);
+        consola.setText("g");
     }
 
     private void abrirArchivo() {
@@ -97,7 +111,7 @@ public class Inicio extends JFrame {
     }
 
     private void analizarCodigo() {
-        tableModel.setRowCount(0);
+
         String codigoFuente = codigo.getText();
         Parser parser = new Parser(codigoFuente);
         Escaner escaner = new Escaner(codigoFuente);
@@ -106,39 +120,46 @@ public class Inicio extends JFrame {
         try {
             parser.Inicia();
             int i = 0;
-            String token = escaner.getToken(true); // Obtén el primer token
-            // System.out.println("entro a analizar codigo");
+            String token = escaner.getToken(true);
 
+            tokensModel.setRowCount(0);
             while (!token.equals("EOF")) {
-                // System.out.println("entro al while " + token + " " + i);
                 String tipo = escaner.getTipo();
-
-                // Verifica si hay errores en la lista de errores y accede correctamente
                 String error = (i < errores.size()) ? errores.get(i) : "";
-
-                // Imprime el token y el error (si hay)
-                tableModel.addRow(new Object[] { token, tipo, error });
+                tokensModel.addRow(new Object[] { token, tipo, error });
                 i++;
-
-                // Avanza al siguiente token
                 token = escaner.getToken(true);
-                // System.out.println("verificando token");
             }
 
-            // System.out.println("entro a semantico"); // nunca entra aqui
             Semantico semantico = new Semantico(parser);
+            declaracionesModel.setRowCount(0);
+            for (List<String> declaracion : semantico.declaraciones) {
+                String valor = (declaracion.size() > 2) ? declaracion.get(2) : "";
+
+                declaracionesModel.addRow(new Object[] { declaracion.get(0), declaracion.get(1), valor });
+            }
 
             if (errores.stream().anyMatch(e -> e.startsWith("Error"))) {
                 JOptionPane.showMessageDialog(this, "Sintaxis incorrecta", "Resultado", JOptionPane.ERROR_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "Sintaxis correcta", "Resultado", JOptionPane.INFORMATION_MESSAGE);
             }
-            System.out.println(semantico.tokens);
+
+            erroresS = semantico.errores;
+            consola.setText("");
+            if (erroresS.isEmpty()) {
+                consola.append("Análisis semántico correcto\n");
+            } else {
+                consola.append("Errores semánticos:\n");
+            }
+
+            for (String s : erroresS) {
+                consola.append(s + "\n");
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
-
         }
-
     }
 
     private void mostrarError(String mensaje) {
@@ -148,6 +169,5 @@ public class Inicio extends JFrame {
     public static void main(String[] args) {
         Inicio ide = new Inicio();
         ide.setVisible(true);
-
     }
 }
