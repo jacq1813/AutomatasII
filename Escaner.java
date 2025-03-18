@@ -3,6 +3,7 @@ import java.util.List;
 
 public class Escaner {
     private String[] tokens;
+    String[] tokens2 = tokens;
     private List<String> palabrasReservadas = Arrays.asList("int", "string", "float", "in", "out", "if", "then",
             "else");
     private List<String> operadores = Arrays.asList("+", "-", "*", "/", "=");

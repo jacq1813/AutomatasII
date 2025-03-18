@@ -24,8 +24,21 @@ public class Semantico {
                 List<String> declaracion = new ArrayList<>();
 
                 declaracion.add(token); // Tipo de dato
-                if (++i < tokens.size())
-                    declaracion.add(tokens.get(i)); // Identificador
+                if (++i < tokens.size()) {
+                    String identificador = tokens.get(i); // Identificador
+                    declaracion.add(identificador);
+
+                    boolean yaDeclarado = false;
+                    for (List<String> decl : declaraciones) {
+                        if (decl.get(1).equals(identificador)) {
+                            yaDeclarado = true;
+                            errores.add(
+                                    "Error: La variable '" + identificador + "' ya ha sido declarada anteriormente.");
+                            break;
+                        }
+                    }
+                }
+
                 if (++i < tokens.size() && tokens.get(i).equals(";")) {
                     declaraciones.add(declaracion);
                 }
