@@ -18,3 +18,27 @@ digito -> 	0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 letra -> 	[A-Z] | [a-z]
 
 
+
+int c ;
+string x ;
+if c > 5 then
+x = "hola" ;
+
+
+int c ;
+int h ;
+string x ;
+float f ;
+
+if c > 7 then
+in > x ;
+else
+in > f ;
+
+
+int c ;
+int h ;
+string x ;
+float f ;
+
+in > x ;
